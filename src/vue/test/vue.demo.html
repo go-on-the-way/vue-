@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue测试</title>
+</head>
+<body>
+    <div id="app">
+        {{a}}
+        <slot>
+            {{b}}
+            {{parseFloat(1)}}
+        </slot>
+        <child-component @hook:created="handleChildCreated"></child-component>
+        <div>{{arr[0]}}</div>
+    </div>
+    <script src="./my-vue.js"></script>
+    <script>
+        // Vue.config.keyCodes.shift = 16
+
+        const ChildComponent = {
+            data(){
+                return {
+                    message:'this is child component'
+                }
+            },
+            template:'<div>{{message}}</div>'
+        }
+
+        let instance = new Vue({
+            el:'#app',
+            components:{
+                ChildComponent
+            },
+            data(vm){
+                console.log(vm)
+                return {
+                    name:null,
+                    a:1,
+                    b:2,
+                    fn:function(){
+                        console.log('函数被观察了')
+                    },
+                    arr:[1,2]
+                }
+            },
+            watch:{
+                fn(val){
+                    if(val){
+                        val()
+                    }
+                }
+            },
+            computed:{
+            },
+            created(){
+                this.name = 'HcySunYang'
+                this.$nextTick(() => {
+                    this.name = 'hcy'
+                    console.log('第一个 $nextTick')
+                    this.$nextTick(() => { console.log('第二个 $nextTick') })
+                })
+            },
+            mounted(){
+                this.fn = function(params) {
+                    console.log('fn 被修改了')
+                }
+                this.arr[0] = 2
+            },
+            methods:{
+                handleChildCreated(){
+                    // 为什么没有起作用?
+                    console.log('vue created')
+                }
+            }
+        })
+    </script>
+</body>
+</html>
